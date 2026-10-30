@@ -403,8 +403,10 @@ def solubility_temperature(
     }
 
 
-def salt_analysis(cation: str = "copper", seed: int | None = None) -> dict:
-    data = {
+def salt_analysis(
+    cation: str = "copper", anion: str = "chloride", seed: int | None = None
+) -> dict:
+    cations = {
         "ammonium": ("no precipitate; ammonia gas on warming", "#f1f5f9"),
         "magnesium": ("white precipitate, insoluble in excess NaOH", "#f8fafc"),
         "aluminium": ("white gelatinous precipitate, soluble in excess NaOH", "#f1f5f9"),
@@ -418,17 +420,69 @@ def salt_analysis(cation: str = "copper", seed: int | None = None) -> dict:
         "barium": ("white precipitate, insoluble in excess", "#f1f5f9"),
         "lead": ("white precipitate, soluble in excess NaOH", "#f8fafc"),
     }
-    observation, colour = data[cation]
+    anions = {
+        "carbonate": (
+            "dilute HCl gives brisk effervescence; the gas turns limewater milky",
+            "#f1f5f9",
+        ),
+        "nitrate": (
+            "brown ring at the junction with conc. H2SO4 (FeSO4 added)",
+            "#78350f",
+        ),
+        "nitrite": ("dilute HCl gives pale brown fumes of NO2", "#b45309"),
+        "sulphate": (
+            "BaCl2 gives a white precipitate insoluble in dilute HCl",
+            "#f8fafc",
+        ),
+        "sulphite": (
+            "dilute HCl gives SO2, which turns acidified K2Cr2O7 green",
+            "#4ade80",
+        ),
+        "chloride": (
+            "AgNO3 gives a white precipitate soluble in excess NH4OH",
+            "#f8fafc",
+        ),
+        "bromide": (
+            "AgNO3 gives a pale yellow precipitate sparingly soluble in NH4OH",
+            "#fef08a",
+        ),
+        "iodide": (
+            "AgNO3 gives a yellow precipitate insoluble in NH4OH",
+            "#fde047",
+        ),
+    }
+    cation_obs, colour = cations[cation]
+    anion_obs, _ = anions[anion]
     return {
         "kind": "qualitative",
-        "table": [{"Cation": cation, "Observation with NaOH": observation}],
+        "table": [
+            {
+                "Ion": f"{cation} (cation)",
+                "Reagent": "NaOH solution",
+                "Observation": cation_obs,
+            },
+            {
+                "Ion": f"{anion} (anion)",
+                "Reagent": "see observation",
+                "Observation": anion_obs,
+            },
+        ],
         "series": [],
         "notes": [
             "Cations are identified by the colour of the hydroxide precipitate and by "
-            "whether it dissolves in excess sodium hydroxide."
+            "whether it dissolves in excess sodium hydroxide.",
+            "Anions are identified by the gas evolved with dilute acid or by the "
+            "precipitate formed with barium chloride or silver nitrate.",
         ],
-        "extras": [("Precipitate", observation, "")],
-        "observation": {"label": "Observation", "colour": colour, "value": observation},
+        "extras": [
+            ("Cation", cation, ""),
+            ("Anion", anion, ""),
+        ],
+        "observation": {
+            "label": "Cation observation",
+            "colour": colour,
+            "value": cation_obs,
+        },
     }
 
 

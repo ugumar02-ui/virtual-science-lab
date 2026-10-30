@@ -301,28 +301,44 @@ CHEMISTRY = [
         "id": "chem-salt-analysis-xii",
         "subject": "chemistry",
         "grade": "XII",
-        "title": "Salt Analysis — Identification of Cations",
-        "subtitle": "Use sodium hydroxide to identify the cation in an unknown salt.",
+        "title": "Salt Analysis — Identification of Cations and Anions",
+        "subtitle": "Use sodium hydroxide, acids and silver/barium salts to identify both ions in an unknown salt.",
         "engine": "chemistry.engines.salt_analysis",
         "theory": "Cations give characteristic hydroxide precipitates with sodium hydroxide. The colour of "
-        "the precipitate and whether it dissolves in excess reagent identifies the cation.",
-        "apparatus": ["Test tubes", "Test tube rack", "Dropper", "Sodium hydroxide solution"],
+        "the precipitate and whether it dissolves in excess reagent identifies the cation. Anions are "
+        "identified by the gas they release with dilute acid (carbonate, sulphite, nitrite), by the "
+        "brown-ring test (nitrate), or by the precipitate they give with barium chloride (sulphate) "
+        "and silver nitrate (chloride, bromide, iodide).",
+        "apparatus": [
+            "Test tubes", "Test tube rack", "Dropper", "Sodium hydroxide solution",
+            "Dilute hydrochloric acid", "Barium chloride solution", "Silver nitrate solution",
+            "Ammonium hydroxide solution", "Limewater", "Litmus paper",
+        ],
         "procedure": [
             "Dissolve a little of the salt in distilled water.",
-            "Add sodium hydroxide solution drop by drop.",
-            "Record the colour of the precipitate formed.",
+            "Add sodium hydroxide solution drop by drop and record the precipitate.",
             "Add excess sodium hydroxide and note whether the precipitate dissolves.",
+            "To a fresh portion add dilute hydrochloric acid and test any gas with limewater.",
+            "Add barium chloride solution to test for sulphate.",
+            "Add silver nitrate solution, then excess ammonium hydroxide, to test for halides.",
+            "Record the cation and the anion and name the salt.",
         ],
         "controls": [
             {"key": "cation", "label": "Cation in the unknown salt", "type": "select",
              "options": ["ammonium", "magnesium", "aluminium", "calcium", "nickel", "cobalt",
                          "iron(II)", "iron(III)", "copper", "zinc", "barium", "lead"],
              "default": "copper"},
+            {"key": "anion", "label": "Anion in the unknown salt", "type": "select",
+             "options": ["carbonate", "nitrate", "nitrite", "sulphate", "sulphite",
+                         "chloride", "bromide", "iodide"],
+             "default": "chloride"},
         ],
         "viva": [
             {"q": "Why is the precipitate tested with excess sodium hydroxide?", "a": "Some hydroxides, such as those of aluminium and zinc, are amphoteric and dissolve in excess alkali, which helps identify them."},
             {"q": "Which cation gives a reddish-brown precipitate?", "a": "Iron(III), as Fe(OH)₃."},
             {"q": "How is the ammonium ion confirmed?", "a": "Warming with sodium hydroxide releases ammonia gas, which turns damp red litmus paper blue."},
+            {"q": "How is a carbonate confirmed?", "a": "Dilute acid releases carbon dioxide, which turns limewater milky."},
+            {"q": "How are chloride, bromide and iodide distinguished?", "a": "Silver nitrate gives white, pale yellow and yellow precipitates respectively; only the chloride precipitate dissolves in excess ammonium hydroxide."},
         ],
     },
     {

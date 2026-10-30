@@ -33,7 +33,13 @@ python3 -m venv .venv
 |---|---|---|---|---|---|
 | Physics | 4 | 4 | 2 | 2 | 12 |
 | Chemistry | 3 | 5 | 2 | 2 | 12 |
-| Biology | 7 | 1 | 2 | 1 | 11 |
+| Biology | 7 | 1 | 3 | 0 | 11 |
+
+Every practical carries the **exact AKU-EB topic and activity number** it was built from.
+The app shows that reference under the title, and the *Syllabus coverage* page compares
+the number of simulations with the number of activities listed in each official table
+(205 activities in total). See [`docs/SYLLABUS_COVERAGE.md`](docs/SYLLABUS_COVERAGE.md)
+for the full audit.
 
 Every practical has:
 

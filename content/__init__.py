@@ -3,8 +3,14 @@
 from .biology import BIOLOGY
 from .chemistry import CHEMISTRY
 from .physics import PHYSICS
+from .syllabus_map import OFFICIAL_COUNTS, SYLLABUS
 
 PRACTICALS: list[dict] = PHYSICS + CHEMISTRY + BIOLOGY
+
+# Attach the official AKU-EB reference to every practical so the UI can show
+# exactly which syllabus line each simulation covers.
+for _p in PRACTICALS:
+    _p["syllabus"] = SYLLABUS.get(_p["id"], {})
 
 SUBJECTS = {
     "physics": {"label": "Physics", "icon": "⚛️", "colour": "#2563eb"},

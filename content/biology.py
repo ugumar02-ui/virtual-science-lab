@@ -297,9 +297,9 @@ BIOLOGY = [
         ],
     },
     {
-        "id": "bio-blood-pressure-xii",
+        "id": "bio-blood-pressure-xi",
         "subject": "biology",
-        "grade": "XII",
+        "grade": "XI",
         "title": "Measuring Blood Pressure with a Sphygmomanometer",
         "subtitle": "Measure systolic and diastolic pressure and relate it to body conditions.",
         "engine": "biology.engines.blood_pressure",

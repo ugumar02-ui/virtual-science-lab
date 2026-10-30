@@ -6,6 +6,7 @@ Run:  streamlit run app.py
 import streamlit as st
 
 from content import GRADES, PRACTICALS, SUBJECTS, level_of
+from content.syllabus_map import OFFICIAL_COUNTS
 from ui import renderer
 
 st.set_page_config(
@@ -81,35 +82,68 @@ def home_page() -> None:
 def coverage_page() -> None:
     st.title("📋 Syllabus coverage")
     st.caption(
-        "Every practical below is built from the AKU-EB 2025–26 syllabus documents and can be "
-        "performed end to end in the app."
+        "Every practical in this app is traced to a line in the official AKU-EB 2025–26 "
+        "topic-wise practical table. No practical has been invented."
     )
 
-    st.metric("Practicals simulated", len(PRACTICALS))
+    total_official = sum(sum(g.values()) for g in OFFICIAL_COUNTS.values())
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Practicals simulated", len(PRACTICALS))
+    c2.metric("Syllabus activities listed", total_official)
+    c3.metric("Subjects", len(SUBJECTS))
+
+    st.divider()
 
     for key, meta in SUBJECTS.items():
         items = [p for p in PRACTICALS if p["subject"] == key]
         if not items:
             continue
         st.subheader(f"{meta['icon']} {meta['label']}")
-        rows = [
-            {
-                "Practical": p["title"],
-                "Class": p["grade"],
-                "Level": level_of(p["grade"]),
-                "Status": "✅ Simulated",
-            }
-            for p in items
-        ]
+
+        rows = []
+        for grade in GRADES:
+            official = OFFICIAL_COUNTS.get(key, {}).get(grade)
+            if official is None:
+                continue
+            built = sum(1 for p in items if p["grade"] == grade)
+            rows.append(
+                {
+                    "Class": grade,
+                    "Level": level_of(grade),
+                    "Simulated": built,
+                    "Activities in syllabus": official,
+                    "Coverage": f"{built / official * 100:.0f}%",
+                }
+            )
         st.dataframe(rows, width="stretch", hide_index=True)
+
+        with st.expander(f"See the {len(items)} practicals and their syllabus lines"):
+            detail = []
+            for p in items:
+                syl = p.get("syllabus") or {}
+                detail.append(
+                    {
+                        "Practical": p["title"],
+                        "Class": p["grade"],
+                        "Official reference": syl.get("ref", "—"),
+                        "Activity": syl.get("activity", "—"),
+                        "Fidelity note": syl.get("note", ""),
+                    }
+                )
+            st.dataframe(detail, width="stretch", hide_index=True)
 
     st.divider()
     st.markdown(
         """
-        **Not yet simulated:** practical activities that are purely observational — prepared
-        slides, specimens, dissections and models (for example the frog specimen, plant and
-        animal tissues, and the goat heart). These need microscope images and 3D models, which
-        is the next phase of the project.
+        **Why coverage is not 100%.** The syllabus tables contain many purely observational
+        activities — prepared slides, specimens, dissections and models (for example the frog
+        specimen, plant and animal tissues, and the goat heart). These need microscope images
+        and 3D models, which is the next phase of the project.
+
+        **Fidelity notes.** Two practicals use a measurable method that differs from the one
+        named in the syllabus: osmosis uses potato tissue instead of cellophane and a thistle
+        funnel, and the microscope practical assesses magnification and field of view rather
+        than focusing technique. Both are flagged on the practical page.
         """
     )
 

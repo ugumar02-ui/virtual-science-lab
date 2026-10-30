@@ -111,7 +111,12 @@ def _report(practical: dict, result: dict, error: float | None) -> str:
         f"# {practical['title']}",
         "",
         f"*{practical.get('subtitle', '')}*  ",
-        f"Class {practical.get('grade', '')} · AKU-EB practical",
+        f"Class {practical.get('grade', '')} · AKU-EB practical  ",
+    ]
+    syllabus = practical.get("syllabus") or {}
+    if syllabus.get("ref"):
+        lines.append(f"Syllabus: {syllabus['ref']} — {syllabus.get('activity', '')}")
+    lines += [
         "",
         "## Apparatus",
         *[f"- {a}" for a in practical.get("apparatus", [])],
@@ -165,6 +170,15 @@ def render(practical: dict) -> None:
         f"{practical.get('subtitle', '')}  ·  Class {practical['grade']} "
         f"({level_of(practical['grade'])}) · AKU-EB"
     )
+
+    syllabus = practical.get("syllabus") or {}
+    if syllabus.get("ref"):
+        st.markdown(
+            f"📋 **Syllabus:** {syllabus['ref']}  \n"
+            f"*{syllabus.get('activity', '')}*"
+        )
+    if syllabus.get("note"):
+        st.warning(f"**How this simulation differs:** {syllabus['note']}")
 
     tab_sim, tab_theory, tab_viva = st.tabs(
         ["🔬 Simulation", "📖 Theory & Procedure", "🎓 Viva"]
