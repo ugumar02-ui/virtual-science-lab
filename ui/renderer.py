@@ -16,6 +16,8 @@ def _build_controls(practical: dict, teacher_mode: bool) -> dict:
         else:
             visible.append(ctrl)
 
+    params.update(practical.get("fixed", {}))
+
     if not visible:
         return params
 
@@ -204,8 +206,63 @@ def render(practical: dict) -> None:
             if teacher_mode:
                 st.info("Teacher mode: instructor-only values are visible below.")
 
+        student_titre = None
+        if practical.get("canvas") == "titration":
+            from ui import canvas as canvas_ui
+
+            st.subheader("Perform the titration")
+            st.caption(
+                "Open the tap, keep the flask swirling, and close it the moment a pale pink "
+                "colour persists. Add one drop at a time near the end."
+            )
+            canvas_ui.titration_canvas(
+                acid_conc=params["acid_conc"],
+                acid_volume=params["acid_volume"],
+                base_conc=params["base_conc"],
+                n_factor=params.get("n_factor", 1),
+                initial_reading=st.session_state.get(f"{practical['id']}::initial", 0.0),
+            )
+            with st.container(border=True):
+                st.markdown("**Record your own reading**")
+                c1, c2 = st.columns([2, 1])
+                student_titre = c1.number_input(
+                    "Mean titre of base used (cm³)",
+                    min_value=0.0,
+                    max_value=50.0,
+                    value=0.0,
+                    step=0.05,
+                    key=f"{practical['id']}::titre",
+                    help="Final burette reading minus initial reading, averaged over concordant runs.",
+                )
+                c2.metric("Your titre", f"{student_titre:.2f} cm³")
+                if student_titre == 0:
+                    st.caption(
+                        "Run the titration above, then type the volume you used to have the "
+                        "app calculate the concentration from *your* reading."
+                    )
+
         engine = registry.get_engine(practical["engine"])
         result = engine(**params, seed=st.session_state.seed)
+
+        if student_titre:
+            n = params.get("n_factor", 1)
+            measured = params["base_conc"] * student_titre / (n * params["acid_volume"])
+            result["measured"] = measured
+            result["accepted"] = params["acid_conc"]
+            result["table"] = [
+                {
+                    "Mean titre (cm³)": round(student_titre, 2),
+                    "Moles of base used (mol)": round(
+                        params["base_conc"] * student_titre / 1000, 6
+                    ),
+                    "Calculated concentration (mol/dm³)": round(measured, 4),
+                }
+            ]
+            result["notes"] = [
+                f"Calculated from your own reading: c(acid) = c(base) × V(base) ÷ "
+                f"({n} × V(acid)) = {params['base_conc']:.2f} × {student_titre:.2f} ÷ "
+                f"({n} × {params['acid_volume']:.0f}) = {measured:.4f} mol/dm³."
+            ] + result["notes"]
 
         st.divider()
         q = practical.get("quantity")

@@ -45,6 +45,16 @@ Every practical has:
 - **Viva questions** with model answers
 - A **downloadable lab report** (Markdown) with readings, result and precautions
 
+### The titration canvas
+
+The two volumetric analysis practicals (standardising NaOH, and the molarity of oxalic
+acid) open with a **real burette**: a stopcock you can turn, drops that fall into the
+conical flask, a meniscus that moves down the scale, and phenolphthalein that flashes
+pink and then stays pink at the endpoint. The student reads the burette themselves and
+types the titre in — the concentration is then calculated from *their* reading, not from
+a hidden model answer.
+
+
 ### Teacher mode
 
 Instructor-only values (true acid concentration, true diameter, spring stiffness) are
@@ -66,7 +76,9 @@ virtual-science-lab/
 │   ├── biology/engines.py
 │   └── registry.py
 ├── ui/renderer.py          # schema-driven page: controls, plot, table, report
-├── tests/test_engines.py   # unit tests for the maths
+├── ui/canvas.py            # Tier-2 canvas widgets (titration burette)
+├── ui/titration_canvas.html
+├── tests/                  # engine and canvas tests
 └── .streamlit/config.toml  # theme
 ```
 
@@ -137,7 +149,8 @@ around the same URL.
 
 ## Roadmap
 
-- [ ] Tier-2 canvas simulations (burette close-up, microscope focusing, circuit wiring)
+- [x] Tier-2 canvas simulation: titration burette with stopcock, drops and endpoint flash
+- [ ] Tier-2 canvas simulations: microscope focusing, circuit wiring
 - [ ] Student accounts and saved attempts (SQLite → Postgres)
 - [ ] Teacher dashboard with class results and common mistakes
 - [ ] PDF lab reports matching the AKU-EB format

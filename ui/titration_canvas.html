@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root {
+    --ink: #0f172a;
+    --muted: #64748b;
+    --line: #cbd5e1;
+    --card: #ffffff;
+    --pink: #e0218a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Source Sans Pro", system-ui, -apple-system, Segoe UI, sans-serif;
+    color: var(--ink);
+    background: transparent;
+  }
+  .wrap {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 6px 4px 0 4px;
+  }
+  .stage {
+    background: linear-gradient(180deg, #f8fafc, #eef2f7);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 6px;
+  }
+  .panel {
+    flex: 1 1 240px;
+    min-width: 230px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .readout {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .readout .label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; }
+  .readout .value { font-size: 30px; font-weight: 700; line-height: 1.1; }
+  .readout .value small { font-size: 14px; font-weight: 500; color: #94a3b8; }
+  .status {
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    background: #f1f5f9;
+    border: 1px solid var(--line);
+    min-height: 42px;
+  }
+  .status.ok { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+  .status.warn { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+  .status.bad { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+  button {
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: .15s;
+  }
+  button:hover { border-color: #94a3b8; }
+  button:active { transform: translateY(1px); }
+  button.primary { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
+  button.primary:hover { background: #1e40af; }
+  button.on { background: var(--pink); border-color: var(--pink); color: #fff; }
+  .row { display: flex; gap: 8px; }
+  .row > button { flex: 1; }
+  .hint { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .legend { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--pink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <svg id="scene" viewBox="0 0 460 660" width="330" height="474" aria-label="Titration apparatus">
+      <defs>
+        <linearGradient id="glass" x1="0" x2="1">
+          <stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/>
+          <stop offset="0.45" stop-color="#f8fafc" stop-opacity="0.55"/>
+          <stop offset="1" stop-color="#e2e8f0" stop-opacity="0.75"/>
+        </linearGradient>
+        <clipPath id="flaskClip">
+          <path d="M 206,495 L 206,525 L 146,612 Q 140,624 156,624 L 284,624 Q 300,624 294,612 L 234,525 L 234,495 Z"/>
+        </clipPath>
+        <linearGradient id="flaskGlass" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/>
+          <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.15"/>
+          <stop offset="1" stop-color="#cbd5e1" stop-opacity="0.35"/>
+        </linearGradient>
+      </defs>
+
+      <!-- retort stand -->
+      <rect x="44" y="26" width="14" height="600" rx="4" fill="#94a3b8"/>
+      <rect x="30" y="620" width="120" height="14" rx="4" fill="#64748b"/>
+      <rect x="58" y="150" width="140" height="12" rx="5" fill="#94a3b8"/>
+      <rect x="58" y="162" width="12" height="60" rx="5" fill="#94a3b8" opacity="0.6"/>
+
+      <!-- burette body -->
+      <rect x="200" y="30" width="40" height="400" rx="6" fill="url(#glass)" stroke="#94a3b8" stroke-width="1.5"/>
+      <!-- liquid in burette -->
+      <rect id="buretteLiquid" x="202" y="30" width="36" height="398" fill="#dbeafe" opacity="0.95"/>
+      <ellipse id="meniscus" cx="220" cy="30" rx="18" ry="3" fill="#93c5fd"/>
+      <!-- graduations -->
+      <g id="ticks" stroke="#64748b" stroke-width="1"></g>
+      <g id="tickLabels" fill="#475569" font-size="9" font-family="system-ui" text-anchor="end"></g>
+
+      <!-- stopcock -->
+      <rect x="204" y="430" width="32" height="10" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+      <circle cx="220" cy="448" r="15" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+      <line id="handle" x1="220" y1="448" x2="220" y2="433" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="220" cy="448" r="4" fill="#334155"/>
+      <!-- tip -->
+      <path d="M 213,462 L 227,462 L 223,492 L 217,492 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+      <circle id="drop" cx="220" cy="492" r="3.5" fill="#93c5fd" opacity="0"/>
+
+      <!-- flask -->
+      <path d="M 206,495 L 206,525 L 146,612 Q 140,624 156,624 L 284,624 Q 300,624 294,612 L 234,525 L 234,495 Z"
+            fill="#ffffff" stroke="#94a3b8" stroke-width="1.5" opacity="0.85"/>
+      <g clip-path="url(#flaskClip)">
+        <rect id="flaskLiquid" x="130" y="560" width="180" height="70" fill="#eef6ff"/>
+        <ellipse id="flaskSurface" cx="220" cy="560" rx="80" ry="4" fill="#dbeafe" opacity="0.9"/>
+      </g>
+      <path d="M 206,495 L 206,525 L 146,612 Q 140,624 156,624 L 284,624 Q 300,624 294,612 L 234,525 L 234,495 Z"
+            fill="url(#flaskGlass)" stroke="#94a3b8" stroke-width="1.5"/>
+      <!-- white tile -->
+      <rect x="120" y="624" width="200" height="12" rx="3" fill="#ffffff" stroke="#cbd5e1"/>
+      <rect x="120" y="636" width="200" height="4" rx="2" fill="#e2e8f0"/>
+    </svg>
+  </div>
+
+  <div class="panel">
+    <div class="readout">
+      <div class="label">Burette reading</div>
+      <div class="value"><span id="reading">0.00</span> <small>cm³</small></div>
+    </div>
+
+    <div id="status" class="status">Open the tap to let the base run in.</div>
+
+    <div class="row">
+      <button id="tapBtn" class="primary">Open tap</button>
+      <button id="dropBtn">+ 1 drop</button>
+    </div>
+    <div class="row">
+      <button id="newBtn">New sample</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+
+    <div class="legend"><span class="dot"></span> Phenolphthalein: colourless → pink</div>
+    <div class="hint">
+      Turn the tap, then close it as soon as a <b>pale pink</b> colour persists after swirling.
+      Adding one drop at a time near the end is what a real titration needs.
+    </div>
+  </div>
+</div>
+
+<script>
+const CFG = __CONFIG__;
+
+const state = {
+  delivered: 0,
+  tap: false,
+  flash: 0,
+  dropY: null,
+  sample: 1,
+  initial: CFG.initialReading || 0
+};
+
+const els = {
+  liquid: document.getElementById("buretteLiquid"),
+  meniscus: document.getElementById("meniscus"),
+  handle: document.getElementById("handle"),
+  drop: document.getElementById("drop"),
+  flaskLiquid: document.getElementById("flaskLiquid"),
+  flaskSurface: document.getElementById("flaskSurface"),
+  reading: document.getElementById("reading"),
+  status: document.getElementById("status"),
+  tapBtn: document.getElementById("tapBtn"),
+  dropBtn: document.getElementById("dropBtn"),
+  newBtn: document.getElementById("newBtn"),
+  resetBtn: document.getElementById("resetBtn"),
+  ticks: document.getElementById("ticks"),
+  tickLabels: document.getElementById("tickLabels")
+};
+
+// --- burette scale: 0 cm3 at y=30, 50 cm3 at y=430
+const TOP = 30, BOTTOM = 430, CAPACITY = 50;
+const pxPerCm3 = (BOTTOM - TOP) / CAPACITY;
+
+(function buildScale() {
+  let ticks = "", labels = "";
+  for (let i = 0; i <= CAPACITY; i++) {
+    const y = TOP + i * pxPerCm3;
+    const long = i % 5 === 0;
+    ticks += `<line x1="${long ? 200 : 208}" y1="${y}" x2="240" y2="${y}" />`;
+    if (long) labels += `<text x="196" y="${y + 3}">${i}</text>`;
+  }
+  els.ticks.innerHTML = ticks;
+  els.tickLabels.innerHTML = labels;
+})();
+
+function veq() {
+  return (CFG.nFactor * CFG.acidConc * CFG.acidVolume) / CFG.baseConc;
+}
+
+function pH(v) {
+  const acidMmol = CFG.acidConc * CFG.acidVolume;
+  const baseMmol = CFG.baseConc * v;
+  const total = CFG.acidVolume + v;
+  const excessAcid = acidMmol - baseMmol / CFG.nFactor;
+  if (Math.abs(excessAcid) < 1e-9) return 7.0;
+  if (excessAcid > 0) return -Math.log10(excessAcid / total);
+  return 14 + Math.log10(-excessAcid / total);
+}
+
+function mix(a, b, t) {
+  const pa = [1, 3, 5].map(i => parseInt(a.substr(i, 2), 16));
+  const pb = [1, 3, 5].map(i => parseInt(b.substr(i, 2), 16));
+  const c = pa.map((x, i) => Math.round(x + (pb[i] - x) * t));
+  return "#" + c.map(x => x.toString(16).padStart(2, "0")).join("");
+}
+
+function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+
+function draw() {
+  const d = state.delivered;
+  const level = TOP + (state.initial + d) * pxPerCm3;
+  els.liquid.setAttribute("y", level);
+  els.liquid.setAttribute("height", Math.max(0, BOTTOM - level));
+  els.meniscus.setAttribute("cy", level);
+
+  els.handle.setAttribute("transform", state.tap ? "rotate(90 220 448)" : "rotate(0 220 448)");
+
+  const ph = pH(d);
+  const persistent = clamp((ph - 8.2) / 1.6, 0, 1);
+  const alpha = clamp(Math.max(persistent, state.flash * 0.65), 0, 1);
+  const colour = mix("#eef6ff", "#e0218a", alpha);
+  els.flaskLiquid.setAttribute("fill", colour);
+  els.flaskSurface.setAttribute("fill", mix("#dbeafe", "#f472b6", alpha));
+  els.flaskSurface.setAttribute("opacity", String(0.55 + alpha * 0.4));
+
+  els.reading.textContent = (state.initial + d).toFixed(2);
+
+  const target = veq();
+  let msg, cls = "";
+  if (d === 0) {
+    msg = "Open the tap to let the base run in.";
+  } else if (ph < 8.2) {
+    if (target - d < 1.5) {
+      msg = "Faint pink flash on swirling — you are within a few drops.";
+      cls = "warn";
+    } else {
+      msg = "Adding base… keep swirling the flask.";
+    }
+  } else if (d <= target + 0.30) {
+    msg = "Endpoint: pale pink colour persists. Close the tap and read the burette.";
+    cls = "ok";
+  } else {
+    msg = "Overshot — the colour is too deep. This titre is not concordant.";
+    cls = "bad";
+  }
+  els.status.textContent = msg;
+  els.status.className = "status " + cls;
+
+  if (state.dropY !== null) {
+    els.drop.setAttribute("cy", state.dropY);
+    els.drop.setAttribute("opacity", "1");
+  } else {
+    els.drop.setAttribute("opacity", "0");
+  }
+}
+
+function addDrop() {
+  if (state.delivered >= CAPACITY) return;
+  state.delivered = Math.min(CAPACITY, state.delivered + 0.05);
+  const target = veq();
+  if (state.delivered < target && target - state.delivered < 1.2) state.flash = 1;
+  state.dropY = 500;
+}
+
+els.tapBtn.addEventListener("click", () => {
+  state.tap = !state.tap;
+  els.tapBtn.textContent = state.tap ? "Close tap" : "Open tap";
+  els.tapBtn.classList.toggle("on", state.tap);
+});
+
+els.dropBtn.addEventListener("click", addDrop);
+
+els.resetBtn.addEventListener("click", () => {
+  state.delivered = 0;
+  state.flash = 0;
+  state.tap = false;
+  els.tapBtn.textContent = "Open tap";
+  els.tapBtn.classList.remove("on");
+  draw();
+});
+
+els.newBtn.addEventListener("click", () => {
+  state.sample += 1;
+  state.initial = Math.round(Math.random() * 40) / 100;
+  state.delivered = 0;
+  state.flash = 0;
+  state.tap = false;
+  els.tapBtn.textContent = "Open tap";
+  els.tapBtn.classList.remove("on");
+  draw();
+});
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min((now - last) / 1000, 0.05);
+  last = now;
+
+  if (state.tap && state.delivered < CAPACITY) {
+    state.delivered = Math.min(CAPACITY, state.delivered + CFG.flowRate * dt);
+  }
+  state.flash *= Math.pow(0.90, dt * 60);
+
+  if (state.dropY !== null) {
+    state.dropY += 900 * dt;
+    if (state.dropY > 558) state.dropY = null;
+  }
+
+  draw();
+  requestAnimationFrame(frame);
+}
+
+draw();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

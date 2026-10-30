@@ -140,6 +140,8 @@ CHEMISTRY = [
              "options": ["phenolphthalein", "methyl orange"], "default": "phenolphthalein"},
         ],
         "quantity": {"label": "Concentration of the acid", "unit": "mol/dm³", "tolerance": 0.02, "decimals": 3},
+        "canvas": "titration",
+        "fixed": {"n_factor": 1},
         "viva": [
             {"q": "Why is a white tile used under the flask?", "a": "So the colour change of the indicator can be seen sharply against a plain background."},
             {"q": "Why is the burette rinsed with the solution it will contain?", "a": "To avoid diluting the solution, which would change its concentration."},
@@ -171,6 +173,8 @@ CHEMISTRY = [
              "min": 0.02, "max": 0.50, "step": 0.01, "default": 0.10, "unit": "mol/dm³"},
         ],
         "quantity": {"label": "Molarity of oxalic acid", "unit": "mol/dm³", "tolerance": 0.02, "decimals": 3},
+        "canvas": "titration",
+        "fixed": {"n_factor": 2, "acid_type": "weak"},
         "viva": [
             {"q": "Why is oxalic acid described as diprotic?", "a": "Each molecule can donate two protons, so it reacts with two moles of sodium hydroxide."},
             {"q": "Which indicator is used and why?", "a": "Phenolphthalein, because the salt of a weak acid with a strong base gives an endpoint above pH 7."},
