@@ -75,7 +75,8 @@ virtual-science-lab/
 ├── content/                # the syllabus: every practical is a dict here
 │   ├── physics.py
 │   ├── chemistry.py
-│   └── biology.py
+│   ├── biology.py
+│   └── syllabus_map.py     # official AKU-EB reference for every practical
 ├── core/                   # simulation engines — pure Python, no Streamlit
 │   ├── physics/engines.py
 │   ├── chemistry/engines.py
@@ -84,7 +85,9 @@ virtual-science-lab/
 ├── ui/renderer.py          # schema-driven page: controls, plot, table, report
 ├── ui/canvas.py            # Tier-2 canvas widgets (titration burette)
 ├── ui/titration_canvas.html
-├── tests/                  # engine and canvas tests
+├── mobile/                 # Flutter Android WebView wrapper (APK)
+├── tests/                  # engine, canvas and syllabus-mapping tests
+├── docs/                   # syllabus coverage audit
 └── .streamlit/config.toml  # theme
 ```
 
@@ -149,9 +152,21 @@ do it after the cloud version is working.
 
 ### 4. Android
 
-Open the deployed URL in Chrome → menu → **Add to Home screen**. It installs as a PWA
-with its own icon and full-screen window. A real APK later is just a thin WebView wrapper
-around the same URL.
+**Quick option — PWA:** open the deployed URL in Chrome → menu → **Add to Home screen**.
+It installs with its own icon and full-screen window.
+
+**APK:** the `mobile/` folder is a Flutter WebView wrapper around the same URL.
+
+```bash
+cd mobile
+flutter pub get
+flutter build apk --release
+# output: mobile/build/app/outputs/flutter-apk/app-release.apk
+```
+
+The lab address lives in `mobile/lib/config.dart`. Change that one line to point the APK
+at the Streamlit Cloud link or at a school LAN address, then rebuild. Inside the app the
+link icon in the top bar also lets you change the address without rebuilding.
 
 ## Roadmap
 
