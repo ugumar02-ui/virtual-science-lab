@@ -159,6 +159,9 @@
 
     <div class="legend"><span class="dot"></span> Phenolphthalein: colourless → pink</div>
     <div class="hint">
+      Initial reading: <b id="initial">0.00</b> cm³ — subtract this from your final reading.
+    </div>
+    <div class="hint">
       Turn the tap, then close it as soon as a <b>pale pink</b> colour persists after swirling.
       Adding one drop at a time near the end is what a real titration needs.
     </div>
@@ -185,6 +188,7 @@ const els = {
   flaskLiquid: document.getElementById("flaskLiquid"),
   flaskSurface: document.getElementById("flaskSurface"),
   reading: document.getElementById("reading"),
+  initial: document.getElementById("initial"),
   status: document.getElementById("status"),
   tapBtn: document.getElementById("tapBtn"),
   dropBtn: document.getElementById("dropBtn"),
@@ -251,13 +255,14 @@ function draw() {
   els.flaskSurface.setAttribute("opacity", String(0.55 + alpha * 0.4));
 
   els.reading.textContent = (state.initial + d).toFixed(2);
+  els.initial.textContent = state.initial.toFixed(2);
 
   const target = veq();
   let msg, cls = "";
   if (d === 0) {
     msg = "Open the tap to let the base run in.";
   } else if (ph < 8.2) {
-    if (target - d < 1.5) {
+    if (target - d < 0.8) {
       msg = "Faint pink flash on swirling — you are within a few drops.";
       cls = "warn";
     } else {
@@ -324,6 +329,11 @@ function frame(now) {
 
   if (state.tap && state.delivered < CAPACITY) {
     state.delivered = Math.min(CAPACITY, state.delivered + CFG.flowRate * dt);
+  }
+  // With the tap open near the endpoint the pink appears and fades as the
+  // base mixes in — a pulse, not a solid colour.
+  if (state.tap && state.delivered < veq() && veq() - state.delivered < 1.2) {
+    state.flash = 0.55 + 0.45 * Math.sin(now / 90);
   }
   state.flash *= Math.pow(0.90, dt * 60);
 
