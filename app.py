@@ -78,6 +78,42 @@ def home_page() -> None:
                     )
 
 
+def coverage_page() -> None:
+    st.title("📋 Syllabus coverage")
+    st.caption(
+        "Every practical below is built from the AKU-EB 2025–26 syllabus documents and can be "
+        "performed end to end in the app."
+    )
+
+    st.metric("Practicals simulated", len(PRACTICALS))
+
+    for key, meta in SUBJECTS.items():
+        items = [p for p in PRACTICALS if p["subject"] == key]
+        if not items:
+            continue
+        st.subheader(f"{meta['icon']} {meta['label']}")
+        rows = [
+            {
+                "Practical": p["title"],
+                "Class": p["grade"],
+                "Level": level_of(p["grade"]),
+                "Status": "✅ Simulated",
+            }
+            for p in items
+        ]
+        st.dataframe(rows, width="stretch", hide_index=True)
+
+    st.divider()
+    st.markdown(
+        """
+        **Not yet simulated:** practical activities that are purely observational — prepared
+        slides, specimens, dissections and models (for example the frog specimen, plant and
+        animal tissues, and the goat heart). These need microscope images and 3D models, which
+        is the next phase of the project.
+        """
+    )
+
+
 with st.sidebar:
     st.markdown("## 🧪 Virtual Lab")
     st.caption("AKU-EB · SSC & HSSC · 2025–26")
@@ -85,14 +121,15 @@ with st.sidebar:
 
     subject = st.radio(
         "Subject",
-        options=["home", *SUBJECTS],
-        format_func=lambda s: "🏠 Home"
-        if s == "home"
-        else f"{SUBJECTS[s]['icon']} {SUBJECTS[s]['label']}",
+        options=["home", *SUBJECTS, "coverage"],
+        format_func=lambda s: {
+            "home": "🏠 Home",
+            "coverage": "📋 Syllabus coverage",
+        }.get(s, f"{SUBJECTS[s]['icon']} {SUBJECTS[s]['label']}" if s in SUBJECTS else s),
     )
 
     selected = None
-    if subject != "home":
+    if subject not in ("home", "coverage"):
         grade = st.selectbox("Class", ["All", *GRADES])
         items = [
             p
@@ -116,7 +153,9 @@ with st.sidebar:
     )
     st.caption(f"{len(PRACTICALS)} practicals loaded")
 
-if selected is None:
+if subject == "coverage":
+    coverage_page()
+elif selected is None:
     home_page()
 else:
     renderer.render(selected)
