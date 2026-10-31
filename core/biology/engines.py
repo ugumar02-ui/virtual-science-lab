@@ -430,3 +430,70 @@ def blood_pressure(condition: str = "resting", seed: int | None = None) -> dict:
             ("Pulse pressure", f"{sys_meas - dia_meas}", "mmHg"),
         ],
     }
+
+
+def genetics_dice(rolls: int = 40, seed: int | None = None) -> dict:
+    """Simulate a monohybrid cross with two dice.
+
+    Each die is one parent's gamete: 1-3 carries the dominant allele T,
+    4-6 carries the recessive allele t. Rolling both dice once gives one
+    offspring. This is syllabus activity 12-14 (Biology XII, Topic 22).
+    """
+    import random
+
+    rng = random.Random(seed)
+    rolls = int(rolls)
+    counts = {"TT": 0, "Tt": 0, "tt": 0}
+    for _ in range(rolls):
+        first = "T" if rng.randint(1, 6) <= 3 else "t"
+        second = "T" if rng.randint(1, 6) <= 3 else "t"
+        genotype = "".join(sorted(first + second, key=lambda a: (a != "T", a)))
+        counts[genotype] += 1
+
+    expected = {"TT": rolls * 0.25, "Tt": rolls * 0.50, "tt": rolls * 0.25}
+    dominant = (counts["TT"] + counts["Tt"]) / rolls * 100
+
+    table = [
+        {
+            "Genotype": g,
+            "Phenotype": "tall" if g != "tt" else "short",
+            "Observed": counts[g],
+            "Expected": round(expected[g], 1),
+            "Observed (%)": round(counts[g] / rolls * 100, 1),
+        }
+        for g in ("TT", "Tt", "tt")
+    ]
+
+    return {
+        "kind": "quantitative",
+        "measured": dominant,
+        "accepted": 75.0,
+        "table": table,
+        "series": [
+            {
+                "name": "Observed",
+                "type": "bar",
+                "x": ["TT", "Tt", "tt"],
+                "y": [counts[g] for g in ("TT", "Tt", "tt")],
+            },
+            {
+                "name": "Expected (1:2:1)",
+                "type": "bar",
+                "x": ["TT", "Tt", "tt"],
+                "y": [round(expected[g], 1) for g in ("TT", "Tt", "tt")],
+            },
+        ],
+        "x_label": "Genotype",
+        "y_label": "Number of offspring",
+        "notes": [
+            "A monohybrid cross of two heterozygous parents (Tt × Tt) gives the "
+            "genotypic ratio 1 TT : 2 Tt : 1 tt and the phenotypic ratio 3 tall : 1 short.",
+            "The dice only approximate these ratios. With few rolls the numbers are noisy; "
+            "increase the number of rolls and the observed columns move closer to 25%, 50% "
+            "and 25%.",
+        ],
+        "extras": [
+            ("Tall offspring", f"{counts['TT'] + counts['Tt']}", "of " + str(rolls)),
+            ("Short offspring", f"{counts['tt']}", "of " + str(rolls)),
+        ],
+    }

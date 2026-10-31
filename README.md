@@ -27,13 +27,13 @@ python3 -m venv .venv
 
 ## What is inside
 
-**35 practicals** across grades IX–XII, taken from the AKU-EB 2025–26 syllabi.
+**36 practicals** across grades IX–XII, taken from the AKU-EB 2025–26 syllabi.
 
 | Subject | IX | X | XI | XII | Total |
 |---|---|---|---|---|---|
 | Physics | 4 | 4 | 2 | 2 | 12 |
 | Chemistry | 3 | 5 | 2 | 2 | 12 |
-| Biology | 7 | 1 | 3 | 0 | 11 |
+| Biology | 7 | 1 | 3 | 1 | 12 |
 
 Every practical carries the **exact AKU-EB topic and activity number** it was built from.
 The app shows that reference under the title, and the *Syllabus coverage* page compares

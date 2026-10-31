@@ -325,4 +325,37 @@ BIOLOGY = [
             {"q": "Why should the cuff be at the level of the heart?", "a": "Otherwise the hydrostatic pressure of the blood column gives a reading that is too high or too low."},
         ],
     },
+    {
+        "id": "bio-genetics-dice-xii",
+        "subject": "biology",
+        "grade": "XII",
+        "title": "Simulating Inheritance with Dice",
+        "subtitle": "Roll two dice to model a monohybrid cross and test the 3:1 ratio.",
+        "engine": "biology.engines.genetics_dice",
+        "theory": "In a monohybrid cross between two heterozygous parents (Tt × Tt), each parent "
+        "passes on either the dominant allele T or the recessive allele t with equal probability. "
+        "A Punnett square predicts the genotypes 1 TT : 2 Tt : 1 tt, which gives the phenotypes "
+        "3 tall : 1 short. Two dice can model this: 1–3 on a die means the parent passed T, and "
+        "4–6 means t. Rolling both dice once produces one offspring.",
+        "apparatus": ["Two dice", "Notebook", "Pencil", "Calculator"],
+        "procedure": [
+            "Decide that 1, 2 or 3 on a die represents the dominant allele T and 4, 5 or 6 the recessive allele t.",
+            "Roll both dice together once for each offspring and record the two alleles.",
+            "Write the genotype as TT, Tt or tt and note the phenotype (tall or short).",
+            "Repeat until you have the planned number of offspring.",
+            "Count each genotype and calculate its percentage.",
+            "Compare the observed ratio with the expected 1:2:1 ratio and the 3:1 phenotype ratio.",
+        ],
+        "controls": [
+            {"key": "rolls", "label": "Number of offspring (rolls)", "type": "slider",
+             "min": 10, "max": 120, "step": 10, "default": 40},
+        ],
+        "quantity": {"label": "Tall offspring", "unit": "%", "tolerance": 0.15, "decimals": 1},
+        "viva": [
+            {"q": "Why does a die with six faces model a gamete?", "a": "Each parent has two alleles and passes one at random, so each allele has a 1 in 2 chance — the same as choosing one of two equally likely outcomes. Three faces for T and three for t gives that 1:1 chance."},
+            {"q": "What ratio do you expect in the offspring of Tt × Tt?", "a": "Genotypes 1 TT : 2 Tt : 1 tt; phenotypes 3 tall : 1 short."},
+            {"q": "Why do your results not match the expected ratio exactly?", "a": "The dice are random. Small samples show chance variation; the observed ratio approaches the expected ratio as the number of rolls increases."},
+            {"q": "What is the difference between genotype and phenotype?", "a": "Genotype is the pair of alleles (TT, Tt or tt); phenotype is the visible characteristic (tall or short)."},
+        ],
+    },
 ]

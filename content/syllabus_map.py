@@ -172,4 +172,8 @@ SYLLABUS: dict[str, dict[str, str]] = {
         "ref": "Biology XI · Topic 13 Transport · activity 32",
         "activity": "Measure the blood pressure by using sphygmomanometer.",
     },
+    "bio-genetics-dice-xii": {
+        "ref": "Biology XII · Topic 22 Variation and Genetics · activities 12–14",
+        "activity": "Set up a controlled experiment using dice to simulate genetic inheritance, record each combination of alleles (TT, Tt, tt) and calculate the probability of each genotype.",
+    },
 }

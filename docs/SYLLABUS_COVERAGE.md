@@ -19,9 +19,9 @@ if a practical is not on this list, it is not in the app.
 | Biology | IX (SSC) | 7 | 19 |
 | Biology | X (SSC) | 1 | 36 |
 | Biology | XI (HSSC) | 3 | 34 |
-| Biology | XII (HSSC) | 0 | 22 |
+| Biology | XII (HSSC) | 1 | 22 |
 
-**35 practicals simulated out of 205 syllabus activities.**
+**36 practicals simulated out of 205 syllabus activities.**
 
 ## Practical-by-practical audit
 
@@ -172,6 +172,10 @@ if a practical is not on this list, it is not in the app.
 - **Measuring Blood Pressure with a Sphygmomanometer** — Class XI  
   Biology XI · Topic 13 Transport · activity 32  
   > Measure the blood pressure by using sphygmomanometer.
+
+- **Simulating Inheritance with Dice** — Class XII  
+  Biology XII · Topic 22 Variation and Genetics · activities 12–14  
+  > Set up a controlled experiment using dice to simulate genetic inheritance, record each combination of alleles (TT, Tt, tt) and calculate the probability of each genotype.
 
 ## What is not simulated yet
 
