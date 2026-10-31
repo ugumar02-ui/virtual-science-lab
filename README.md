@@ -85,7 +85,7 @@ virtual-science-lab/
 ├── ui/renderer.py          # schema-driven page: controls, plot, table, report
 ├── ui/canvas.py            # Tier-2 canvas widgets (titration burette)
 ├── ui/titration_canvas.html
-├── mobile/                 # Flutter Android WebView wrapper (APK)
+├── mobile/                 # Android APK wrapper (native WebView + Flutter version)
 ├── tests/                  # engine, canvas and syllabus-mapping tests
 ├── docs/                   # syllabus coverage audit
 └── .streamlit/config.toml  # theme
@@ -155,18 +155,23 @@ do it after the cloud version is working.
 **Quick option — PWA:** open the deployed URL in Chrome → menu → **Add to Home screen**.
 It installs with its own icon and full-screen window.
 
-**APK:** the `mobile/` folder is a Flutter WebView wrapper around the same URL.
+**APK — ready to install:** download the signed APK from the
+[v1.0.0 release](https://github.com/ugumar02-ui/virtual-science-lab/releases/download/v1.0.0/VirtualScienceLab-1.0.apk).
+On the phone, open the file and allow installation from this source. Inside the app, tap
+the 🔗 button in the header to enter your Streamlit URL (or a school LAN address); the
+address is remembered.
+
+To rebuild the APK, `mobile/native-android/` is a plain Android WebView app — no Flutter
+and no NDK download needed:
 
 ```bash
-cd mobile
-flutter pub get
-flutter build apk --release
-# output: mobile/build/app/outputs/flutter-apk/app-release.apk
+cd mobile/native-android
+./gradlew assembleRelease
+# output: app/build/outputs/apk/release/app-release.apk
 ```
 
-The lab address lives in `mobile/lib/config.dart`. Change that one line to point the APK
-at the Streamlit Cloud link or at a school LAN address, then rebuild. Inside the app the
-link icon in the top bar also lets you change the address without rebuilding.
+The default address is in `MainActivity.java` (`DEFAULT_URL`). `mobile/` also contains a
+Flutter wrapper if you prefer that route; it needs the Android NDK installed.
 
 ## Roadmap
 

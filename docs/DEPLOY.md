@@ -19,24 +19,22 @@ No secrets or environment variables are needed.
 
 ## 2. Android APK
 
-The wrapper lives in `mobile/`. It opens the deployed URL inside a WebView.
+A signed APK is already published in the
+[v1.0.0 release](https://github.com/ugumar02-ui/virtual-science-lab/releases/download/v1.0.0/VirtualScienceLab-1.0.apk).
+Inside the app, tap the 🔗 button and type the lab address; it is remembered.
+
+To rebuild, `mobile/native-android/` is a plain Android WebView app (no Flutter, no NDK):
 
 ```bash
-cd mobile
-flutter pub get
-flutter build apk --release
+cd mobile/native-android
+./gradlew assembleRelease
 ```
 
-Output: `mobile/build/app/outputs/flutter-apk/app-release.apk`
+Output: `mobile/native-android/app/build/outputs/apk/release/app-release.apk`
 
-Set the permanent URL first in `mobile/lib/config.dart`:
-
-```dart
-const String kLabUrl = 'https://<subdomain>.streamlit.app';
-```
-
-Then rebuild. The APK is also usable without a rebuild: tap the link icon in the top bar
-and type the lab address.
+Change `DEFAULT_URL` in `mobile/native-android/app/src/main/java/pk/akueb/virtualsciencelab/MainActivity.java`
+to ship a different default address. `mobile/` also holds a Flutter wrapper if preferred;
+that one needs the Android NDK.
 
 ## Temporary demo link
 
