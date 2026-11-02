@@ -2,15 +2,21 @@
 
 from .biology import BIOLOGY
 from .chemistry import CHEMISTRY
+from .depth_biology import BIOLOGY_DEPTH
+from .depth_chemistry import CHEMISTRY_DEPTH
+from .depth_physics import PHYSICS_DEPTH
 from .physics import PHYSICS
 from .syllabus_map import OFFICIAL_COUNTS, SYLLABUS
 
 PRACTICALS: list[dict] = PHYSICS + CHEMISTRY + BIOLOGY
 
-# Attach the official AKU-EB reference to every practical so the UI can show
-# exactly which syllabus line each simulation covers.
+DEPTH = PHYSICS_DEPTH | CHEMISTRY_DEPTH | BIOLOGY_DEPTH
+
+# Attach the official AKU-EB reference and the extended theory material to every
+# practical so the UI can render a complete lesson from schema alone.
 for _p in PRACTICALS:
     _p["syllabus"] = SYLLABUS.get(_p["id"], {})
+    _p["depth"] = DEPTH.get(_p["id"], {})
 
 SUBJECTS = {
     "physics": {"label": "Physics", "icon": "⚛️", "colour": "#2563eb"},

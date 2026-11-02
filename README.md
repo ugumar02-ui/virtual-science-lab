@@ -43,13 +43,25 @@ for the full audit.
 
 Every practical has:
 
-- **Theory** and **procedure** written for the AKU-EB paper
-- An **interactive simulation** with the real apparatus values (lengths, concentrations,
-  voltages, temperatures)
+- A **themed lab bench** with a vector drawing of the apparatus, a digital instrument
+  readout, and controls for the real variables (lengths, concentrations, voltages,
+  temperatures)
+- **Extended theory**: learning objectives, two or more explanatory passages, the working
+  equations, and a "why it matters" context box
 - An **observation table** with realistic experimental noise
 - A **result check** — measured value vs accepted value with percentage error
-- **Viva questions** with model answers
-- A **downloadable lab report** (Markdown) with readings, result and precautions
+- **Precautions**, **sources of error** and **exam technique** written for the AKU-EB paper
+- **Six viva questions** with model answers — three core questions plus three that push
+  further into the physics, chemistry or biology
+- A **downloadable lab report** (Markdown) containing the readings, result, theory,
+  precautions, errors, exam tips and viva answers
+
+Deep links are supported, so a teacher can share one practical directly:
+
+```
+https://<your-app>/?p=bio-osmosis-ix
+https://<your-app>/?p=chem-standardise-naoh-x
+```
 
 ### The titration canvas
 
@@ -76,6 +88,9 @@ virtual-science-lab/
 │   ├── physics.py
 │   ├── chemistry.py
 │   ├── biology.py
+│   ├── depth_physics.py    # extended theory, context and viva per practical
+│   ├── depth_chemistry.py
+│   ├── depth_biology.py
 │   └── syllabus_map.py     # official AKU-EB reference for every practical
 ├── core/                   # simulation engines — pure Python, no Streamlit
 │   ├── physics/engines.py
@@ -83,10 +98,12 @@ virtual-science-lab/
 │   ├── biology/engines.py
 │   └── registry.py
 ├── ui/renderer.py          # schema-driven page: controls, plot, table, report
+├── ui/theme.py             # palette, CSS and page components
+├── ui/bench.py             # vector apparatus scenes for the lab bench
 ├── ui/canvas.py            # Tier-2 canvas widgets (titration burette)
 ├── ui/titration_canvas.html
 ├── mobile/                 # Android APK wrapper (native WebView + Flutter version)
-├── tests/                  # engine, canvas and syllabus-mapping tests
+├── tests/                  # engine, canvas, syllabus and content tests
 ├── docs/                   # syllabus coverage audit
 └── .streamlit/config.toml  # theme
 ```
