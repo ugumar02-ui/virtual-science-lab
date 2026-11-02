@@ -5,7 +5,7 @@ Run:  streamlit run app.py
 
 import streamlit as st
 
-from content import GRADES, PRACTICALS, SUBJECTS, level_of
+from content import GRADES, PRACTICALS, SUBJECTS, by_id, level_of
 from content.syllabus_map import OFFICIAL_COUNTS
 from ui import renderer
 
@@ -35,6 +35,13 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+def _open_practical(p: dict) -> None:
+    """Callback: jump straight from a home-page card to that practical."""
+    st.session_state["subject_choice"] = p["subject"]
+    st.session_state[f"grade_choice_{p['subject']}"] = "All"
+    st.session_state["practical_choice"] = p["id"]
 
 
 def home_page() -> None:
@@ -77,6 +84,15 @@ def home_page() -> None:
                         f"Class {p['grade']} · {level}</span>",
                         unsafe_allow_html=True,
                     )
+                    if st.button(
+                        "Open practical →",
+                        key=f"open-{p['id']}",
+                        width="stretch",
+                        type="secondary",
+                        on_click=_open_practical,
+                        args=(p,),
+                    ):
+                        pass
 
 
 def coverage_page() -> None:
@@ -148,6 +164,10 @@ def coverage_page() -> None:
     )
 
 
+def _reset_practical() -> None:
+    st.session_state.pop("practical_choice", None)
+
+
 with st.sidebar:
     st.markdown("## 🧪 Virtual Lab")
     st.caption("AKU-EB · SSC & HSSC · 2025–26")
@@ -160,22 +180,26 @@ with st.sidebar:
             "home": "🏠 Home",
             "coverage": "📋 Syllabus coverage",
         }.get(s, f"{SUBJECTS[s]['icon']} {SUBJECTS[s]['label']}" if s in SUBJECTS else s),
+        key="subject_choice",
+        on_change=_reset_practical,
     )
 
     selected = None
     if subject not in ("home", "coverage"):
-        grade = st.selectbox("Class", ["All", *GRADES])
+        grade = st.selectbox("Class", ["All", *GRADES], key=f"grade_choice_{subject}")
         items = [
             p
             for p in PRACTICALS
             if p["subject"] == subject and (grade == "All" or p["grade"] == grade)
         ]
         if items:
-            selected = st.selectbox(
+            chosen = st.selectbox(
                 "Practical",
-                options=items,
-                format_func=lambda p: f"{p['title']}  ·  {p['grade']}",
+                options=[p["id"] for p in items],
+                format_func=lambda pid: f"{by_id(pid)['title']}  ·  {by_id(pid)['grade']}",
+                key="practical_choice",
             )
+            selected = by_id(chosen)
         else:
             st.info("No practicals for this class yet.")
 
