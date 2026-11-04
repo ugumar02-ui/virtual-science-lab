@@ -7,8 +7,10 @@ teaching material comes from the attached ``depth`` record.
 
 from __future__ import annotations
 
-import streamlit as st
+import random
+
 import plotly.graph_objects as go
+import streamlit as st
 
 from core import registry
 from ui import bench, theme
@@ -17,13 +19,31 @@ PALETTE = ["#2c4bd8", "#0f766e", "#b45309", "#9f1239", "#7c3aed", "#0284c7"]
 
 
 # --------------------------------------------------------------------- controls
-def _build_controls(practical: dict, teacher_mode: bool) -> dict:
+def _instructor_value(practical_id: str, ctrl: dict, seed: int):
+    """Pick a repeatable value for an instructor-only control.
+
+    Students should not know the true value in advance, but a new trial should
+    still mean a new object: the choice is seeded by the practical, the control
+    and the trial number so reruns stay stable.
+    """
+    if ctrl["type"] not in {"slider", "number"}:
+        return ctrl["default"]
+    lo, hi, step = float(ctrl["min"]), float(ctrl["max"]), float(ctrl["step"])
+    rng = random.Random(f"{practical_id}::{ctrl['key']}::{seed}")
+    value = lo + rng.random() * (hi - lo)
+    return round(round(value / step) * step, 6)
+
+
+def _build_controls(practical: dict, teacher_mode: bool, stacked: bool = False) -> dict:
     controls = practical.get("controls", [])
     params: dict = {}
     visible = []
+    seed = st.session_state.get("seed", 1)
     for ctrl in controls:
         if ctrl.get("teacher_only") and not teacher_mode:
-            params[ctrl["key"]] = ctrl["default"]
+            # The student never sees this value: the instructor hands out a fresh
+            # object/sample for every trial, so the apparatus itself changes too.
+            params[ctrl["key"]] = _instructor_value(practical["id"], ctrl, seed)
         else:
             visible.append(ctrl)
 
@@ -32,12 +52,12 @@ def _build_controls(practical: dict, teacher_mode: bool) -> dict:
     if not visible:
         return params
 
-    cols = st.columns(min(3, len(visible)))
+    cols = None if stacked else st.columns(min(3, len(visible)))
     for i, ctrl in enumerate(visible):
         unit = ctrl.get("unit", "")
         label = f"{ctrl['label']} ({unit})" if unit else ctrl["label"]
         key = f"{practical['id']}::{ctrl['key']}"
-        with cols[i % len(cols)]:
+        with (st.container() if cols is None else cols[i % len(cols)]):
             if ctrl["type"] == "slider":
                 params[ctrl["key"]] = st.slider(
                     label,
@@ -416,24 +436,31 @@ def _lab_tab(practical: dict) -> None:
     teacher_mode = st.session_state.get("teacher_mode", False)
 
     st.markdown("#### 1 · Set up the apparatus")
-    bench.scene(practical)
-    st.caption(
-        "Move the controls and watch the instrument respond. Each new set of readings "
-        "applies a fresh random measurement error, just as a real experiment would."
-    )
-    params = _build_controls(practical, teacher_mode)
 
     if "seed" not in st.session_state:
         st.session_state.seed = 1
 
-    run_col, note_col = st.columns([1, 3])
-    with run_col:
+    stage_col, control_col = st.columns([3, 2], gap="large")
+
+    with control_col:
+        st.markdown("**Controls**")
         if st.button("🔄 New set of readings", width="stretch", type="primary"):
             st.session_state.seed += 1
-    with note_col:
+        params = _build_controls(practical, teacher_mode, stacked=True)
         st.caption(f"Trial run #{st.session_state.seed}")
         if teacher_mode:
             st.info("Teacher mode is on: instructor-only values are visible.")
+
+    engine = registry.get_engine(practical["engine"])
+    result = engine(**params, seed=st.session_state.seed)
+
+    with stage_col:
+        bench.scene(practical, params, result)
+        st.caption(
+            "The apparatus is live: move the controls and it responds. Each new set of "
+            "readings changes the unknown sample and the measurement error, as a real "
+            "experiment would."
+        )
 
     student_titre = None
     if practical.get("canvas") == "titration":
@@ -469,9 +496,6 @@ def _lab_tab(practical: dict) -> None:
                     "Run the titration above, then type the volume you used to have the "
                     "app calculates the concentration from *your* reading."
                 )
-
-    engine = registry.get_engine(practical["engine"])
-    result = engine(**params, seed=st.session_state.seed)
 
     if student_titre:
         n = params.get("n_factor", 1)

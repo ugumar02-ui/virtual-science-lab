@@ -190,9 +190,57 @@ div[data-baseweb="input"] input::placeholder { color: #94a3b8; }
 }
 .bench-stage svg { display: block; width: 100%; height: auto; }
 .bench-caption {
-  position: absolute; left: 16px; bottom: 12px; max-width: calc(100% - 32px);
-  background: rgba(11,18,32,.82); color: #e2e8f0; padding: .34rem .78rem;
-  border-radius: 999px; font-size: .78rem; font-weight: 600; letter-spacing: .01em;
+  background: linear-gradient(90deg, #0b1220, #132a52); color: #dbeafe;
+  padding: .55rem .95rem; font-size: .78rem; font-weight: 600;
+  letter-spacing: .01em; border-top: 1px solid rgba(255,255,255,.08);
+}
+
+/* ---------- live bench motion ---------- */
+@keyframes bench-bubble {
+  0%   { transform: translateY(0) scale(.7); opacity: 0; }
+  22%  { opacity: .95; }
+  100% { transform: translateY(-30px) scale(1.12); opacity: 0; }
+}
+.bench-stage .bub { animation: bench-bubble 2.4s ease-in infinite; }
+.bench-stage .bub.b1 { animation-delay: 0s; }
+.bench-stage .bub.b2 { animation-delay: .8s; }
+.bench-stage .bub.b3 { animation-delay: 1.6s; }
+
+@keyframes bench-flicker {
+  0%, 100% { transform: scale(1, 1); opacity: .94; }
+  35%      { transform: scale(.94, 1.07) skewX(2deg); opacity: .82; }
+  70%      { transform: scale(1.05, .95) skewX(-2deg); opacity: .98; }
+}
+.bench-stage .flick {
+  animation: bench-flicker .85s ease-in-out infinite;
+  transform-box: fill-box; transform-origin: 50% 100%;
+}
+
+@keyframes bench-glow {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.07); }
+}
+.bench-stage .glow {
+  animation: bench-glow 2.6s ease-in-out infinite;
+  transform-box: fill-box; transform-origin: 50% 50%;
+}
+
+@keyframes bench-flow { to { stroke-dashoffset: -32; } }
+.bench-stage .flow { animation: bench-flow 1.1s linear infinite; }
+.bench-stage .flow.slow { animation-duration: 2.6s; }
+
+@keyframes bench-hum {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(1.6px); }
+}
+.bench-stage .hum { animation: bench-hum .28s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bench-stage .bub,
+  .bench-stage .flick,
+  .bench-stage .glow,
+  .bench-stage .flow,
+  .bench-stage .hum { animation: none !important; }
 }
 
 /* ---------- observation tube ---------- */
