@@ -543,9 +543,69 @@ def _lab_tab(practical: dict) -> None:
     )
 
 
+# ------------------------------------------------------------------- navigation
+def _go_to(practical_id: str) -> None:
+    """Callback: make another practical the current page."""
+    from content import by_id
+
+    target = by_id(practical_id)
+    st.session_state["subject_choice"] = target["subject"]
+    st.session_state[f"grade_choice_{target['subject']}"] = "All"
+    st.session_state["practical_choice"] = practical_id
+
+
+def _go_home() -> None:
+    st.session_state["subject_choice"] = "home"
+    st.session_state.pop("practical_choice", None)
+
+
+def _jump_to(key: str) -> None:
+    _go_to(st.session_state[key])
+
+
+def practical_switcher(practical: dict) -> None:
+    """A switch bar that stays visible on the practical page.
+
+    The sidebar is collapsed by default on phones, and after opening a deep
+    link it is easy to feel stuck on one practical. These controls let a
+    student move to any other practical, or back home, without hunting for the
+    sidebar.
+    """
+    from content import PRACTICALS, by_id
+
+    ids = [p["id"] for p in PRACTICALS]
+    here = ids.index(practical["id"])
+    previous_id = ids[here - 1] if here > 0 else ids[-1]
+    next_id = ids[(here + 1) % len(ids)]
+
+    with st.container(border=True, key="practical-switcher"):
+        nav = st.columns([3.4, 0.9, 0.9, 0.9], vertical_alignment="bottom")
+        with nav[0]:
+            key = f"jump::{practical['id']}"
+            st.selectbox(
+                "Switch practical",
+                options=ids,
+                index=here,
+                key=key,
+                on_change=_jump_to,
+                args=(key,),
+                format_func=lambda pid: (
+                    f"{by_id(pid)['title']}  ·  {by_id(pid)['subject'].title()} "
+                    f"class {by_id(pid)['grade']}"
+                ),
+            )
+        nav[1].button("🏠 Home", width="stretch", on_click=_go_home)
+        nav[2].button(
+            "← Previous", width="stretch", on_click=_go_to, args=(previous_id,)
+        )
+        nav[3].button("Next →", width="stretch", on_click=_go_to, args=(next_id,))
+
+
 # ---------------------------------------------------------------------- render
 def render(practical: dict) -> None:
     from content import SUBJECTS, level_of
+
+    practical_switcher(practical)
 
     subject = practical.get("subject", "")
     meta = SUBJECTS.get(subject, {})

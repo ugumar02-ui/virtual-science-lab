@@ -243,6 +243,25 @@ div[data-baseweb="input"] input::placeholder { color: #94a3b8; }
   .bench-stage .hum { animation: none !important; }
 }
 
+/* Clear Streamlit's fixed header so the switch bar is never clipped. */
+div[class*="st-key-practical-switcher"] { margin-top: 1.5rem; }
+@media (max-width: 640px) {
+  /* Keep the three navigation buttons on one row under the full-width picker. */
+  div[class*="st-key-practical-switcher"] [data-testid="stHorizontalBlock"] {
+    flex-wrap: wrap !important;
+  }
+  div[class*="st-key-practical-switcher"] [data-testid="stHorizontalBlock"] > div {
+    width: auto !important;
+  }
+  div[class*="st-key-practical-switcher"] [data-testid="stHorizontalBlock"] > div:first-child {
+    flex: 0 0 100% !important;
+  }
+  div[class*="st-key-practical-switcher"] [data-testid="stHorizontalBlock"] > div:nth-child(n+2) {
+    flex: 1 1 30% !important; min-width: 0 !important;
+  }
+}
+
+
 /* ---------- observation tube ---------- */
 .obs-card {
   display: flex; align-items: center; gap: 1.1rem; background: #fff;
